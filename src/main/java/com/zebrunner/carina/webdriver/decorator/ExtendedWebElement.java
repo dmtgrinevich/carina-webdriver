@@ -1164,6 +1164,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     public ExtendedWebElement format(Object... objects) {
         // todo add support FindBys, FindAll and same annotations
+        ExtendedWebElement formattedElement;
         if (this.element instanceof Proxy) {
             /*
              * if element created using annotation (FindBy, ExtendedFindBy and so on), it will be proxy, so we get it and re-generate locator
@@ -1206,7 +1207,7 @@ public class ExtendedWebElement implements IWebElement {
                 WebElement proxy = (WebElement) Proxy.newProxyInstance(getClass().getClassLoader(),
                         new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                         innerProxy);
-                return new ExtendedWebElement(proxy, this.name);
+                formattedElement =  new ExtendedWebElement(proxy, this.name);
             } catch (Exception e) {
                 throw new RuntimeException("Something went wrong when try to format locator.", e);
             }
@@ -1224,8 +1225,11 @@ public class ExtendedWebElement implements IWebElement {
                         .buildLocatorFromString(locator, objects);
                 LOGGER.debug("Formatted locator is : {}", by);
             }
-            return new ExtendedWebElement(by, name, this.driver, this.searchContext, objects);
+            formattedElement =  new ExtendedWebElement(by, name, this.driver, this.searchContext, objects);
         }
+
+        formattedElement.setName(this.name);
+        return formattedElement;
     }
 
     /**
